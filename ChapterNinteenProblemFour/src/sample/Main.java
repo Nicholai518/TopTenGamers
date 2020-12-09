@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class Main extends Application
@@ -27,50 +28,73 @@ public class Main extends Application
 
 
     @Override
-    public void start(Stage stage) throws Exception
+    public void start(Stage primaryStage) throws Exception
     {
-        // Reference to linked list.
-        RSortLinkedList ll = new RSortLinkedList();
-        //LinkedList1 ll = new LinkedList1();
+        // Reference to gaming linked list.
+        GamingLinkedList topTenGamers = new GamingLinkedList();
 
-        // listView shows current list elements.
-        TextArea listView = new TextArea();
-        listView.setEditable(false);
+        // (Top of menu) Top 10 gamers text
+        Text topDescription = new Text("Top 10 Gamers!");
+        topDescription.setFont(new Font("Verdana", 20));
+        topDescription.setFill(Color.BLACK);
 
-        // Input for user command.
-        TextField cmdTextField = new TextField();
-        cmdTextField.setPrefColumnCount(5);
+        //  Used to display all the players names and scores
+        Label topTenListLabel = new Label();
+        Label topTenListDottedLine = new Label("---------------------------");
 
-        // Displays result of list method that was
-        // invoked by the user command.
-        TextField resultTextField = new TextField();
-        resultTextField.setPrefColumnCount(5);
-        resultTextField.setEditable(false);
+        VBox topTenVBox = new VBox(10, topDescription, topTenListLabel, topTenListDottedLine);
+        topTenVBox.setAlignment(Pos.CENTER);
+        topTenVBox.setPadding(new Insets(10));
 
-        // Attach event handler to cmdTextField
-        EventHandler<ActionEvent> handler =
-                new CommandHandler(ll, listView, resultTextField);
-        cmdTextField.setOnAction(handler);
+        // insert controls
+        Text insertYourScoreText = new Text("Insert Your Score!");
 
-        // HBox to contain command result label and text field. Commenting out for time being. Not needed.
-//        HBox hBox1 = new HBox(10);
-//        Label resultLabel = new Label("Command Result");
-//        hBox1.getChildren().addAll(resultLabel, resultTextField);
+        // Player Name Controls
+        Label playerNameLabel = new Label("Player Name: ");
+        TextField playerNameTextField = new TextField();
+        HBox playerNameHBox = new HBox(10, playerNameLabel, playerNameTextField);
+        playerNameHBox.setAlignment(Pos.CENTER);
+        playerNameHBox.setPadding(new Insets(10));
 
-        // HBox to contain label and text field for command input.
-        HBox hBox2 = new HBox(10);
-        Label cmdLabel = new Label("Command: ");
-        hBox2.getChildren().addAll(cmdLabel, cmdTextField);
+        // Player Score Controls
+        Label playerScoreLabel = new Label("Player Score: ");
+        TextField playerScoreTextField = new TextField();
+        HBox playerScoreHBox = new HBox(10, playerScoreLabel, playerScoreTextField);
+        playerScoreHBox.setAlignment(Pos.CENTER);
+        playerScoreHBox.setPadding(new Insets(10));
 
-        // VBox to contain the user interface components
-        VBox vBox = new VBox(10);
-        vBox.setPadding(new Insets(10));
-        vBox.getChildren().addAll(listView, hBox2);
+        // Buttons
+        Button insertButton = new Button("Insert");
 
-        // Set up the scene and show the stage.
-        stage.setScene(new Scene(vBox));
-        stage.setTitle("Top 10 Players");
-        stage.show();
+        // Vbox container for insert controls
+        VBox insertControlsVBox = new VBox(10, insertYourScoreText, playerNameHBox, playerScoreHBox, insertButton);
+        insertControlsVBox.setAlignment(Pos.CENTER);
+        insertControlsVBox.setPadding(new Insets(10));
+
+        insertButton.setOnAction(e->
+        {
+            // Insert player into linked list
+            topTenGamers.insert(playerNameTextField.getText(),Integer.parseInt(playerScoreTextField.getText()) );
+
+            // Store new linked list in String and update topTenListLabel
+            String topTenPlayers = topTenGamers.toString();
+
+            topTenListLabel.setText(topTenPlayers);
+
+        });
+
+        // Main Menu container containing the top 10 player data and insert controls
+        VBox mainMenuVBox = new VBox(10, topTenVBox, insertControlsVBox);
+        mainMenuVBox.setAlignment(Pos.CENTER);
+        mainMenuVBox.setPadding(new Insets(10));
+
+        // Setting Scene and Stage
+        Scene mainMenuScene = new Scene(mainMenuVBox, 500, 500);
+        primaryStage.setScene(mainMenuScene);
+        primaryStage.setTitle("groupingBy() Collector Example");
+        primaryStage.show();
+
+
     }
 
 
@@ -80,100 +104,5 @@ public class Main extends Application
     }
 
 
-    // Event Handler class for the command text field.
-    class CommandHandler implements EventHandler<ActionEvent>
-    {
-        // Fields to hold information passed to the constructor.
-        private final RSortLinkedList ll;
-        private final TextField resultTextField;
-        private final TextArea listView;
 
-        CommandHandler(RSortLinkedList lList, TextArea lView,
-                       TextField rTfield)
-        {
-            ll = lList;
-            resultTextField = rTfield;
-            listView = lView;
-        }
-
-        @Override
-        public void handle(ActionEvent event)
-        {
-            // Get the command from the command textfield.
-            TextField cmdTextField = (TextField) event.getTarget();
-            String cmdText = cmdTextField.getText();
-
-            // Use a scanner to read the name of the linked list
-            // method and do a switch on it.
-            Scanner sc = new Scanner(cmdText);
-            String cmd = sc.next();
-            switch (cmd)
-            {
-                case "add":
-                    if (sc.hasNextInt())
-                    {
-                        // add index element
-                        int index = sc.nextInt();
-                        String element = sc.next();
-                        ll.add(index, element);
-                    }
-                    else
-                    {
-                        // add element
-                        String element = sc.next();
-                        ll.add(element);
-                    }
-                    listView.setText(ll.toString());
-                    return;
-                case "remove":
-                    if (sc.hasNextInt())
-                    {
-                        // remove index
-                        int index = sc.nextInt();
-                        String res = ll.remove(index);
-                        resultTextField.setText(res);
-                    }
-                    else
-                    {
-                        // remove element
-                        String element = sc.next();
-                        boolean res = ll.remove(element);
-                        String resText = String.valueOf(res);
-                        resultTextField.setText(resText);
-                    }
-                    listView.setText(ll.toString());
-                    return;
-                case "isempty":
-                    String resText = String.valueOf(ll.isEmpty());
-                    resultTextField.setText(resText);
-                    return;
-                case "size":
-                    String resText1 = String.valueOf(ll.size());
-                    resultTextField.setText(resText1);
-                    return;
-
-                case "sort":
-                    if (cmd.equalsIgnoreCase("sort"))
-                    {
-                        ll.sort();
-                        listView.setText(ll.toString());
-                        return;
-                    }
-
-                case "reverse":
-                    if (cmd.equalsIgnoreCase("reverse"))
-                    {
-                        ll.reverse();
-                        listView.setText(ll.toString());
-                        return;
-                    }
-
-                case "insert":
-                    if(cmd.equalsIgnoreCase("insert"))
-                    {
-
-                    }
-            }
-        }
-    }
 }

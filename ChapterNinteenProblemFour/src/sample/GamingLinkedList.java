@@ -8,9 +8,8 @@ public class GamingLinkedList
      The Node class stores a list element
      and a reference to the next node. This is an inner class not a field.
      */
-    private class Node
+    private static class Node
     {
-
 
         // Node Stores player name, their score and next node.
         String playerName;
@@ -65,8 +64,8 @@ public class GamingLinkedList
         }
     }
 
-    private Node first;  // list head
-    private Node last;   // last element in list
+    private static Node first;  // list head
+    private static Node last;   // last element in list
 
     /**
      * Default Constructor.
@@ -85,7 +84,7 @@ public class GamingLinkedList
      false otherwise.
      */
 
-    public boolean isEmpty()
+    public static boolean isEmpty()
     {
         return first == null;
     }
@@ -95,7 +94,7 @@ public class GamingLinkedList
      @return The number of elements in the list.
      */
 
-    public int size()
+    public static int size()
     {
         int count = 0;
         Node p = first;
@@ -116,7 +115,7 @@ public class GamingLinkedList
      @param playerScore The score the player earned
      */
 
-    public void add(String playerName, int playerScore)
+    public static void add(String playerName, int playerScore)
     {
         if (isEmpty())
         {
@@ -141,7 +140,7 @@ public class GamingLinkedList
      @exception IndexOutOfBoundsException When
      index is out of bounds.
      */
-    public void add(int index, String playerName, int playerScore)
+    public static void add(int index, String playerName, int playerScore)
     {
         if (index < 0  || index > size())
         {
@@ -190,7 +189,7 @@ public class GamingLinkedList
         Node p = first;
         while (p != null)
         {
-            strBuilder.append(p.playerName + " " + p.playerScore + "\n");
+            strBuilder.append("Player: " + p.playerName + " / Score:" + p.playerScore + "\n");
             p = p.next;
         }
         return strBuilder.toString();
@@ -259,47 +258,71 @@ public class GamingLinkedList
     // Sort in Descending order so highest score is first (index 0)
     public void sort()
     {
+
         // Create sortedMap
-        SortedMap<String, Integer> gamingScoresMap = new TreeMap<String, Integer>(Collections.reverseOrder());
+        Map<String, Integer> gamingScoresMap = new TreeMap<>();
 
         // Add all nodes to a sorted map
         // See if list is empty
         if(!isEmpty())
         {
+            // flag
+            boolean flag = true;
+
             // Assign first to currentNode
             Node currentNode = first;
 
-            while(currentNode == first ||currentNode.next != null)
+            //while(currentNode == first ||currentNode.next != null)
+            while(flag)
             {
                 gamingScoresMap.put(currentNode.getPlayerName(), currentNode.getPlayerScore());
-                currentNode = currentNode.next;
+
+                // If there is a successor Node, make that current node
+                if(currentNode.next != null)
+                {
+                    currentNode = currentNode.next;
+                }
+                else
+                {
+                    flag = false;
+                }
+
             }
         }
 
         // Remove all nodes from Gaming linked list
         clear();
 
+        // Create array for map keys and values
+        String[] playerNamesArray = gamingScoresMap.keySet().toArray(new String[0]);
+        Integer[] playerScores = gamingScoresMap.values().toArray(new Integer[0]);
 
-        // iterate through the sorted map BACKWARDS adding only 10
+        // Add all array values to array lists
+        List<String> playerNamesArrayList= new ArrayList<>();
+        List<Integer> playerScoresArrayList = new ArrayList<>();
 
-        // Using set to use iterator
-        Set set = gamingScoresMap.entrySet();
-        Iterator i = set.iterator();
+        Collections.addAll(playerNamesArrayList, playerNamesArray);
+        Collections.addAll(playerScoresArrayList, playerScores);
 
-        // Need to alter add method to be able to use here.
-        while(i.hasNext()) {
-            Map.Entry me = (Map.Entry)i.next();
-            GamingLinkedList.add(me.getKey(),me.getValue());
+
+        // Add sorted map values back to GamingLinkedList
+        for(int i = playerNamesArrayList.size() - 1; i >=0; i-- )
+        {
+            add(playerNamesArrayList.get(i), playerScoresArrayList.get(i));
         }
-
-        // Add each key and value as a node to the Gaming linked list
-
     }
 
 
 
     public void insert(String playerName, int playerScore)
     {
+
+        // Short Solution to get everything working
+        add(playerName, playerScore);
+
+        sort();
+
+
         // Ignore any scores less than or equal to minimum score
 
         // checks score to see if player is in top 10
