@@ -260,7 +260,7 @@ public class GamingLinkedList
     {
 
         // Create sortedMap
-        Map<String, Integer> gamingScoresMap = new TreeMap<>();
+        Map<Integer, String> gamingScoresMap = new TreeMap<>();
 
         // Add all nodes to a sorted map
         // See if list is empty
@@ -275,7 +275,7 @@ public class GamingLinkedList
             //while(currentNode == first ||currentNode.next != null)
             while(flag)
             {
-                gamingScoresMap.put(currentNode.getPlayerName(), currentNode.getPlayerScore());
+                gamingScoresMap.put(currentNode.getPlayerScore(), currentNode.getPlayerName());
 
                 // If there is a successor Node, make that current node
                 if(currentNode.next != null)
@@ -294,21 +294,39 @@ public class GamingLinkedList
         clear();
 
         // Create array for map keys and values
-        String[] playerNamesArray = gamingScoresMap.keySet().toArray(new String[0]);
-        Integer[] playerScores = gamingScoresMap.values().toArray(new Integer[0]);
+        Integer[] playerScores =  gamingScoresMap.keySet().toArray(new Integer[0]) ;
+        String[] playerNamesArray =  gamingScoresMap.values().toArray(new String[0]) ;
+
+
 
         // Add all array values to array lists
-        List<String> playerNamesArrayList= new ArrayList<>();
         List<Integer> playerScoresArrayList = new ArrayList<>();
+        List<String> playerNamesArrayList= new ArrayList<>();
 
-        Collections.addAll(playerNamesArrayList, playerNamesArray);
         Collections.addAll(playerScoresArrayList, playerScores);
+        Collections.addAll(playerNamesArrayList, playerNamesArray);
 
+
+        // Lost any order due to keyset
+        Collections.sort(playerScoresArrayList);
+
+
+        // Accumulator
+        int amountOfPlayersAddedToTen = 0;
 
         // Add sorted map values back to GamingLinkedList
         for(int i = playerNamesArrayList.size() - 1; i >=0; i-- )
         {
-            add(playerNamesArrayList.get(i), playerScoresArrayList.get(i));
+
+            if(amountOfPlayersAddedToTen <= 9)
+            {
+                add(gamingScoresMap.get(playerScoresArrayList.get(i)), playerScoresArrayList.get(i));
+
+            }
+
+            // Increment accumulator
+            amountOfPlayersAddedToTen++;
+
         }
     }
 
